@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>BoltPro Engineering Suite</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#202124;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+/* =========================
+   SPLASH SCREEN
+========================= */
+
+#splash{
+    position:fixed;
+    inset:0;
+    background:white;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+    transition:opacity 0.6s ease;
+}
+
+#splash img{
+    width:280px;
+    height:280px;
+    object-fit:contain;
+}
+
+#splash h1{
+    color:#ff8800;
+    margin-top:20px;
+    font-size:42px;
+}
+
+#splash p{
+    color:#666;
+    margin-top:10px;
+    font-size:16px;
+}
+
+/* =========================
+   MAIN APP
+========================= */
+
+.app{
+    width:390px;
+    background:#202124;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 0 30px rgba(0,0,0,0.4);
+}
+
+.header{
+    background:#ff8800;
+    padding:22px;
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.content{
+    padding:25px;
+}
+
+.card{
+    background:#2b2b2b;
+    border:2px solid #3a3a3a;
+    border-radius:16px;
+    padding:20px;
+}
+
+.card-title{
+    margin-bottom:20px;
+    color:#ff8800;
+    font-weight:bold;
+    font-size:18px;
+}
+
+.label{
+    margin-top:16px;
+    margin-bottom:8px;
+    font-size:14px;
+}
+
+select,
+input{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:#3a3a3a;
+    color:white;
+    font-size:15px;
+    outline:none;
+}
+
+button{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:12px;
+    margin-top:16px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:bold;
+    transition:0.2s;
+}
+
+.calculate{
+    background:#ff8800;
+    color:white;
+}
+
+.calculate:hover{
+    background:#ffaa33;
+}
+
+.clear{
+    background:#3a3a3a;
+    color:white;
+}
+
+.clear:hover{
+    background:#505050;
+}
+
+.footer{
+    text-align:center;
+    color:#888;
+    font-size:12px;
+    padding:20px;
+}
+
+/* =========================
+   RESULT BOX
+========================= */
+
+.result{
+    margin-top:20px;
+    background:#2b2b2b;
+    border-radius:14px;
+    padding:20px;
+    white-space:pre-line;
+    font-family:Consolas, monospace;
+    line-height:1.6;
+    display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     SPLASH SCREEN
+========================= -->
+
+<div id="splash">
+
+    <!-- เปลี่ยนรูปได้ -->
+    <img src="boltpro_logo.png" alt="logo">
+
+    <h1>BoltPro</h1>
+
+    <p>Engineering Suite</p>
+
+</div>
+
+<!-- =========================
+     MAIN APP
+========================= -->
+
+<div class="app">
+
+    <div class="header">
+        BoltPro Engineering Suite
+    </div>
+
+    <div class="content">
+
+        <div class="card">
+
+            <div class="card-title">
+                Bolt Configuration
+            </div>
+
+            <!-- BOLT SIZE -->
+            <div class="label">Bolt Size</div>
+
+            <select id="bolt">
+                <option>M4</option>
+                <option>M5</option>
+                <option selected>M6</option>
+                <option>M8</option>
+                <option>M10</option>
+                <option>M12</option>
+                <option>M14</option>
+                <option>M16</option>
+                <option>M18</option>
+                <option>M20</option>
+            </select>
+
+            <!-- MATERIAL -->
+            <div class="label">Material</div>
+
+            <select id="material">
+                <option selected>Steel</option>
+                <option>Stainless</option>
+                <option>Aluminum</option>
+                <option>Titanium</option>
+                <option>Brass</option>
+            </select>
+
+            <!-- GRADE -->
+            <div class="label">Material Grade</div>
+
+            <select id="grade"></select>
+
+            <!-- K FACTOR -->
+            <div class="label">K Factor</div>
+
+            <select id="kfactor">
+                <option>0.10 - Heavy Grease</option>
+                <option>0.15 - Light Oil</option>
+                <option selected>0.20 - Dry Bolt</option>
+                <option>0.25 - Rust/Friction</option>
+            </select>
+
+            <!-- LENGTH -->
+            <div class="label">Thread Length (mm)</div>
+
+            <input
+                type="number"
+                id="length"
+                placeholder="Enter length..."
+            >
+
+        </div>
+
+        <!-- BUTTONS -->
+
+        <button class="calculate" onclick="calculate()">
+            CALCULATE
+        </button>
+
+        <button class="clear" onclick="clearFields()">
+            CLEAR
+        </button>
+
+        <!-- RESULT -->
+
+        <div class="result" id="result"></div>
+
+    </div>
+
+    <div class="footer">
+        BoltPro v3.0
+    </div>
+
+</div>
+
+<script>
+
+/* =========================
+   SPLASH SCREEN
+========================= */
+
+setTimeout(() => {
+
+    const splash = document.getElementById("splash");
+
+    splash.style.opacity = "0";
+
+    setTimeout(() => {
+        splash.style.display = "none";
+    }, 600);
+
+}, 2000);
+
+/* =========================
+   DATA
+========================= */
+
+const boltSizes = {
+    "M4":0.004,
+    "M5":0.005,
+    "M6":0.006,
+    "M8":0.008,
+    "M10":0.010,
+    "M12":0.012,
+    "M14":0.014,
+    "M16":0.016,
+    "M18":0.018,
+    "M20":0.020
+};
+
+const materials = {
+
+    "Steel":{
+        "4.6":4000,
+        "8.8":8000,
+        "10.9":12000,
+        "12.9":15000
+    },
+
+    "Stainless":{
+        "304":5200,
+        "316":5800
+    },
+
+    "Aluminum":{
+        "6061":3100,
+        "7075":5500
+    },
+
+    "Titanium":{
+        "Grade 2":9000,
+        "Grade 5":14000
+    },
+
+    "Brass":{
+        "Standard":2500
+    }
+};
+
+/* =========================
+   UPDATE GRADES
+========================= */
+
+function updateGrades(){
+
+    const material =
+        document.getElementById("material").value;
+
+    const gradeSelect =
+        document.getElementById("grade");
+
+    gradeSelect.innerHTML = "";
+
+    for(let grade in materials[material]){
+
+        const option =
+            document.createElement("option");
+
+        option.value = grade;
+        option.textContent = grade;
+
+        gradeSelect.appendChild(option);
+    }
+}
+
+updateGrades();
+
+document
+.getElementById("material")
+.addEventListener("change", updateGrades);
+
+/* =========================
+   CALCULATE
+========================= */
+
+function calculate(){
+
+    const size =
+        document.getElementById("bolt").value;
+
+    const material =
+        document.getElementById("material").value;
+
+    const grade =
+        document.getElementById("grade").value;
+
+    const length =
+        document.getElementById("length").value;
+
+    const kText =
+        document.getElementById("kfactor").value;
+
+    if(!length){
+
+        alert("Please fill all fields");
+
+        return;
+    }
+
+    const d = boltSizes[size];
+
+    const F = materials[material][grade];
+
+    const K = parseFloat(
+        kText.split(" - ")[0]
+    );
+
+    // Torque
+    const T = K * F * d;
+
+    // lb-ft
+    const lbft = T * 0.73756;
+
+    // Clamp Force
+    const clampForce = T / (K * d);
+
+    const resultText = `
+
+SYSTEM READY
+
+Material : ${material}
+Bolt Size : ${size}
+Grade     : ${grade}
+Length    : ${length} mm
+
+K Factor  : ${K}
+
+========================
+
+Torque
+${T.toFixed(2)} N·m
+
+${lbft.toFixed(2)} lb-ft
+
+========================
+
+Clamp Force
+${clampForce.toFixed(2)} N
+
+`;
+
+    const resultBox =
+        document.getElementById("result");
+
+    resultBox.style.display = "block";
+
+    resultBox.textContent = resultText;
+}
+
+/* =========================
+   CLEAR
+========================= */
+
+function clearFields(){
+
+    document.getElementById("bolt").value = "M6";
+
+    document.getElementById("material").value =
+        "Steel";
+
+    updateGrades();
+
+    document.getElementById("kfactor").value =
+        "0.20 - Dry Bolt";
+
+    document.getElementById("length").value = "";
+
+    document.getElementById("result").style.display =
+        "none";
+}
+
+</script>
+
+</body>
+</html>
